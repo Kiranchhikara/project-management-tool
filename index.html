@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Management Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #e0d8d87e;
+        }
+
+        header {
+            background-color: #4cae4c;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            margin: 20px;
+        }
+
+        .nav-button {
+            background-color: #530c91cc;
+            color: white;
+            padding: 15px 30px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-button:hover {
+            background-color: #4cae4c;
+            transform: scale(1.05);
+        }
+
+        .container {
+            display: none; /* Initially hide all sections */
+            max-width: 800px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: calc(100% - 22px);
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            background-color: #530c91cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        .project {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            background: #f9f9f9;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .task {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px dashed #5bc0de;
+            border-radius: 5px;
+            background: #e9f9fd;
+        }
+
+        .comment {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 4px solid #5bc0de;
+            background: #f1f8ff;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px 0;
+            background-color: #530c91cc;
+            color: white;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .empty-message {
+            text-align: center;
+            font-size: 1.2em;
+            color: #777;
+        }
+
+        .profile-picture {
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+        #hi{
+            text-align: center;
+        }
+      
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Project Management Tool</h1>
+    </header>
+
+    <div class="nav-buttons">
+        <button class="nav-button" onclick="showSection('user-profile')">User Profile</button>
+        <button class="nav-button" onclick="showSection('create-project')">Create Project</button>
+        <button class="nav-button" onclick="showSection('projects')">View Projects</button>
+    </div>
+
+    <div id="user-profile" class="container">
+        <h2 id="hi">Hey'Whatsup</h2>
+        <img src="code.jpg" alt="Profile Picture" class="profile-picture">
+        <p><strong>Name:</strong> Kiran</p>
+        <p><strong>Email:</strong> kittuchhikara@gmail.com</p>
+        <p><strong>Bio:</strong> An advanced web developer with speciality in Frontend .</p>
+    </div>
+
+    <div id="create-project" class="container">
+        <h2>Create Project</h2>
+        <input type="text" id="project-name" placeholder="Project Name" required>
+        <button onclick="createProject()">Create Project</button>
+    </div>
+
+    <div id="projects" class="container">
+        <h2>Projects</h2>
+        <div id="project-list"></div>
+        <div id="task-form" style="display: none;">
+            <h2>Create Task</h2>
+            <input type="text" id="task-title" placeholder="Task Title" required>
+            <input type="text" id="task-assigned" placeholder="Assigned To" required>
+            <div class="button-container">
+                <button onclick="createTask()">Create Task</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2024 Project Management Tool. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        let projects = []; // Store projects in memory
+
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.container').forEach(section => {
+                section.style.display = 'none';
+            });
+            // Show the selected section
+            document.getElementById(sectionId).style.display = 'block';
+
+            if (sectionId === 'projects') {
+                displayProjects();
+            }
+        }
+
+        function createProject() {
+            const projectName = document.getElementById('project-name').value;
+            if (!projectName) return alert('Please enter a project name');
+
+            const newProject = {
+                id: Date.now(),
+                name: projectName,
+                tasks: []
+            };
+
+            projects.push(newProject);
+            document.getElementById('project-name').value = '';
+            alert('Project created successfully!');
+            showSection('projects');
+        }
+
+        function createTask() {
+            const taskTitle = document.getElementById('task-title').value;
+            const assignedTo = document.getElementById('task-assigned').value;
+            const projectId = document.querySelector('input[name="project-id"]:checked').value;
+
+            if (!taskTitle || !assignedTo) return alert('Please fill in all fields');
+
+            const task = {
+                id: Date.now(),
+                title: taskTitle,
+                assignedTo: assignedTo,
+                comments: []
+            };
+
+            const projectIndex = projects.findIndex(project => project.id == projectId);
+            projects[projectIndex].tasks.push(task);
+            document.getElementById('task-title').value = '';
+            document.getElementById('task-assigned').value = '';
+            alert('Task created successfully!');
+            document.getElementById('task-form').style.display = 'none'; // Close the task form
+            displayProjects();
+        }
+
+        function displayProjects() {
+            const projectListDiv = document.getElementById('project-list');
+            projectListDiv.innerHTML = '';
+
+            projects.forEach(project => {
+                const projectDiv = document.createElement('div');
+                projectDiv.className = 'project';
+                projectDiv.innerHTML = `<h3>${project.name}</h3>
+                    <div>
+                        <label>Select to add tasks</label>
+                        <input type="radio" name="project-id" value="${project.id}" onclick="showTaskForm()"> 
+                    </div>
+                    <div class="tasks"></div>`;
+
+                project.tasks.forEach(task => {
+                    const taskDiv = document.createElement('div');
+                    taskDiv.className = 'task';
+                    taskDiv.innerHTML = `<strong>${task.title}</strong> (Assigned to: ${task.assignedTo}) 
+                        <button onclick="addComment(${task.id}, ${project.id})">Comment</button>
+                        <div class="comments"></div>`;
+                    
+                    task.comments.forEach(comment => {
+                        const commentDiv = document.createElement('div');
+                        commentDiv.className = 'comment';
+                        commentDiv.textContent = comment;
+                        taskDiv.querySelector('.comments').appendChild(commentDiv);
+                    });
+
+                    projectDiv.querySelector('.tasks').appendChild(taskDiv);
+                });
+
+                projectListDiv.appendChild(projectDiv);
+            });
+
+            if (projects.length === 0) {
+                projectListDiv.innerHTML = '<p class="empty-message">No projects available. Create a new project!</p>';
+            }
+        }
+
+        function showTaskForm() {
+            const taskForm = document.getElementById('task-form');
+            taskForm.style.display = 'block';
+        }
+
+        function addComment(taskId, projectId) {
+            const comment = prompt("Enter your comment:");
+            if (!comment) return;
+
+            const projectIndex = projects.findIndex(project => project.id == projectId);
+            const taskIndex = projects[projectIndex].tasks.findIndex(task => task.id === taskId);
+            
+            projects[projectIndex].tasks[taskIndex].comments.push(comment);
+            displayProjects();
+        }
+
+        // Show the user profile section by default on load
+        showSection('user-profile');
+    </script>
+</body>
+</html>
